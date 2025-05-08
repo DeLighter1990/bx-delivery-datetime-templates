@@ -5,6 +5,7 @@ if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true)
 }
 
 use Bitrix\Main;
+use Bitrix\Main\Config\Option;
 use Bitrix\Main\Localization\Loc;
 
 /**
@@ -320,6 +321,14 @@ else
 {
 	Main\UI\Extension::load('phone_auth');
 
+    /** DeLight.DeliveryDateTime: Инициализируем компонент для работы с выбором интервала доставки */
+    $APPLICATION->IncludeComponent(
+        'delight:delivery.datetime',
+        '',
+        [],
+        false
+    );
+
 	$themeClass = !empty($arParams['TEMPLATE_THEME']) ? ' bx-'.$arParams['TEMPLATE_THEME'] : '';
 	$hideDelivery = empty($arResult['DELIVERY']);
 	?>
@@ -408,6 +417,21 @@ else
 						</div>
 						<div class="bx-soa-section-content"></div>
 					</div>
+
+                    <?php /** DeLight.DeliveryDateTime: Выводим блок, в котором будет выводиться интервал доставки */ ?>
+                    <!--	DELIVERY INTERVAL BLOCK	-->
+                    <div id="<?= Option::get('delight.deliverydatetime', 'containerId') ?>-block" data-visited="false" class="bx-soa-section bx-active">
+                        <div class="bx-soa-section-title-container d-flex justify-content-between align-items-center flex-nowrap">
+                            <div class="bx-soa-section-title" data-entity="section-title">
+                                <span class="bx-soa-section-title-count"></span>Дата и время доставки
+                            </div>
+                            <div><a href="" class="bx-soa-editstep"><?= $arParams['MESS_EDIT'] ?></a></div>
+                        </div>
+                        <div class="bx-soa-section-content">
+                            <div id="<?= Option::get('delight.deliverydatetime', 'containerId') ?>"></div>
+                        </div>
+                    </div>
+
 					<!--	PICKUP BLOCK	-->
 					<div id="bx-soa-pickup" data-visited="false" class="bx-soa-section" style="display:none">
 						<div class="bx-soa-section-title-container d-flex justify-content-between align-items-center flex-nowrap">
@@ -431,6 +455,21 @@ else
 						</div>
 						<div class="bx-soa-section-content"></div>
 					</div>
+
+                    <?php /** DeLight.DeliveryDateTime: Выводим блок, в котором будет выводиться интервал доставки */ ?>
+                    <!--	DELIVERY INTERVAL BLOCK	-->
+                    <div id="<?= Option::get('delight.deliverydatetime', 'containerId') ?>-block" data-visited="false" class="bx-soa-section bx-active">
+                        <div class="bx-soa-section-title-container d-flex justify-content-between align-items-center flex-nowrap">
+                            <div class="bx-soa-section-title" data-entity="section-title">
+                                <span class="bx-soa-section-title-count"></span>Дата и время доставки
+                            </div>
+                            <div><a href="" class="bx-soa-editstep"><?= $arParams['MESS_EDIT'] ?></a></div>
+                        </div>
+                        <div class="bx-soa-section-content">
+                            <div id="bx-soa-delivery-interval"></div>
+                        </div>
+                    </div>
+
 					<!--	PICKUP BLOCK	-->
 					<div id="bx-soa-pickup" data-visited="false" class="bx-soa-section" style="display:none">
 						<div class="bx-soa-section-title-container d-flex justify-content-between align-items-center flex-nowrap">
@@ -516,6 +555,8 @@ else
 					<div id='bx-soa-region-hidden' class="bx-soa-section"></div>
 					<div id='bx-soa-paysystem-hidden' class="bx-soa-section"></div>
 					<div id='bx-soa-delivery-hidden' class="bx-soa-section"></div>
+                    <?php /** DeLight.DeliveryDateTime: Выводим скрытый блок для корректной работы order_ajax.js */ ?>
+                    <div id="<?= Option::get('delight.deliverydatetime', 'containerId') ?>-block-hidden" class="bx-soa-section"></div>
 					<div id='bx-soa-pickup-hidden' class="bx-soa-section"></div>
 					<div id="bx-soa-properties-hidden" class="bx-soa-section"></div>
 					<div id="bx-soa-auth-hidden" class="bx-soa-section">
@@ -628,7 +669,9 @@ else
 			deliveryBlockId: 'bx-soa-delivery',
 			pickUpBlockId: 'bx-soa-pickup',
 			propsBlockId: 'bx-soa-properties',
-			totalBlockId: 'bx-soa-total'
+			totalBlockId: 'bx-soa-total',
+            <?php /** DeLight.DeliveryDateTime: Передаём ID блока с интервалами доставки */ ?>
+            deliveryDateTimeBlockId: '<?=Option::get('delight.deliverydatetime', 'containerId')?>-block'
 		});
 	</script>
 	<script>

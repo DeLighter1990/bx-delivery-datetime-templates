@@ -113,6 +113,8 @@ BX.namespace('BX.Sale.OrderAjaxComponent');
 			this.pickUpHiddenBlockNode = BX(parameters.pickUpBlockId + '-hidden');
 			this.propsBlockNode = BX(parameters.propsBlockId);
 			this.propsHiddenBlockNode = BX(parameters.propsBlockId + '-hidden');
+			/** DeLight.DeliveryDateTime: Сохраняем в свойство элемент с выбором интервала доставки */
+			this.deliveryDateTimeNode = BX(parameters.deliveryDateTimeBlockId);
 
 			if (this.result.SHOW_AUTH)
 			{
@@ -1893,6 +1895,11 @@ BX.namespace('BX.Sale.OrderAjaxComponent');
 				}
 			}
 
+			/** DeLight.DeliveryDateTime: пропускаем скрытые блоки */
+			if (section.offsetParent === null) {
+				skip = true;
+			}
+
 			return skip;
 		},
 
@@ -2047,6 +2054,10 @@ BX.namespace('BX.Sale.OrderAjaxComponent');
 				case this.propsBlockNode.id:
 					this.editFadePropsBlock();
 					break;
+				/** DeLight.DeliveryDateTime: инициализация блока интервалов доставки */
+				case this.deliveryDateTimeNode.id:
+					this.editDeliveryInterval();
+					break;
 			}
 
 			BX.addClass(node, 'bx-step-completed');
@@ -2144,6 +2155,10 @@ BX.namespace('BX.Sale.OrderAjaxComponent');
 					break;
 				case this.propsBlockNode.id:
 					this.editActivePropsBlock(true);
+					break;
+				/** DeLight.DeliveryDateTime: инициализация блока интервалов доставки */
+				case this.deliveryDateTimeNode.id:
+					this.editDeliveryInterval();
 					break;
 			}
 
@@ -2541,6 +2556,10 @@ BX.namespace('BX.Sale.OrderAjaxComponent');
 					break;
 				case this.propsBlockNode.id:
 					this.editPropsBlock(active);
+					break;
+				/** DeLight.DeliveryDateTime: инициализация блока интервалов доставки */
+				case this.deliveryDateTimeNode.id:
+					this.editDeliveryInterval();
 					break;
 			}
 
@@ -6731,6 +6750,20 @@ BX.namespace('BX.Sale.OrderAjaxComponent');
 
 			BX.bind(node.querySelector('.alert.alert-danger'), 'click', BX.proxy(this.showByClick, this));
 			BX.bind(node.querySelector('.alert.alert-warning'), 'click', BX.proxy(this.showByClick, this));
+		},
+
+		/** DeLight.DeliveryDateTime: Инициализирует блок интервалов доставки */
+		editDeliveryInterval: function () {
+			if (window.DelightDeliveryDatetimeIntervalsBlockComponent != null) {
+				let currentDelivery = this.getSelectedDelivery();
+				if (currentDelivery) {
+					let isBasketAvailable = this.result?.DELIGHT_DELIVERY_DATETIME?.BASKET_IS_AVAILABLE;
+					window.DelightDeliveryDatetimeIntervalsBlockComponent.onSelectDelivery(currentDelivery.ID, this.getSelectedPersonType().ID, isBasketAvailable);
+					if (!this.deliveryDateTimeNode.querySelector('.bx-soa-more')) {
+						this.getBlockFooter(this.deliveryDateTimeNode.querySelector('.bx-soa-section-content'));
+					}
+				}
+			}
 		},
 
 		editPropsItems: function(propsNode)
